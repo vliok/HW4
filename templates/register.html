@@ -2,13 +2,13 @@
 <html>
 
 <head>
-  <title> Login </title>
+  <title> Register </title>
 </head>
 
 <body>
   <br>
   <center>
-  <form action="/authL" method="POST">
+  <form action="/authR" method="POST">
     Username:
     <input type="text" name="username">
     <br>
@@ -18,9 +18,9 @@
     <input type="submit" name="submit">
   </form>
   <br> <br>
-  New member?
-  <form action="/register" method="POST">
-    <input type="submit" name="submit2" value="Create an account">
+  Already a member?
+  <form action="/login" method="POST">
+    <input type="submit" name="submit2" value="Log in">
   </form>
   <br> <br>
   {{message}}

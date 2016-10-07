@@ -3,9 +3,11 @@
 #HW04 -- Big, Heavy, Wood.
 #2016-10-4
 
-from flask import Flask, render_template, request
-import hashlib
+from flask import Flask, render_template, request, redirect, url_for, session
+import hashlib, os
+
 app = Flask(__name__)
+app.secret_key = "thisisasecret"
 
 @app.route("/")
 def mainPage():
@@ -23,7 +25,7 @@ def authenticateL():
     print request.form["username"]
     print request.form["password"]
     print request.headers
-    f = open("accounts.csv","r")
+    f = open("data/accounts.csv","r")
     username = request.form["username"]
     password = request.form["password"]
     h = hashlib.sha1()
@@ -34,6 +36,7 @@ def authenticateL():
         pair[1] = pair[1].rstrip("\n")
         if username == pair[0] and password == pair[1]:
             f.close()
+            session["username"] = username
             return render_template("success.html")
         if username == pair[0] and password != pair[1]:
             f.close()
@@ -41,6 +44,8 @@ def authenticateL():
         if username != pair[0] and password == pair[1]:
             f.close()
             return render_template("login.html",message="Wrong username!")
+        if session["username"] == username:
+            return render_template("login.html",message="Already logged in from another computer!")
     f.close()
     return render_template("login.html",message="Incorrect username and password!")
 
@@ -56,7 +61,7 @@ def authenticateR():
     print request.form["username"]
     print request.form["password"]
     print request.headers
-    f = open("accounts.csv","r")
+    f = open("data/accounts.csv","r")
     username = request.form["username"]
     password = request.form["password"]
     h = hashlib.sha1()
@@ -69,11 +74,23 @@ def authenticateR():
             f.close()
             return render_template("register.html",message="Username already taken!")
     f.close()
-    f = open("accounts.csv","a")
+    f = open("data/accounts.csv","a")
     f.write( username + "," + password + "\n" )
     f.close()
+    #return redirect(url_for("login"))
     return render_template("login.html",message="Account created!")
 
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.pop("username")
+    return render_template("login.html",message="Succesfully logged out.")
+
+'''
+@app.route("/jacobo")
+def js():
+    return redirect(url_for("mainPage"))
+'''
+    
 if __name__ == "__main__" :
     app.debug = True
     app.run()
